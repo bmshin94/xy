@@ -101,7 +101,7 @@ def _leaf(
     href: str,
     url: rx.vars.StringVar[str],
     *,
-    guide_margin_class: str = "ml-[3rem]",
+    guide_margin_class: str = "ml-[2.5rem]",
 ) -> rx.Component:
     """Render one memoized XY documentation leaf.
 
@@ -137,7 +137,7 @@ def _top_level_link(
     icon: str,
     url: rx.vars.StringVar[str],
 ) -> rx.Component:
-    """Render an icon-led direct link aligned with sidebar group headings."""
+    """Render a direct link aligned with icon-free sidebar group headings."""
     active = url == href
     return rx.el.li(
         rx.el.a(
@@ -152,7 +152,6 @@ def _top_level_link(
                 rx.fragment(),
             ),
             rx.box(
-                rx.icon(tag=icon, size=16, class_name="mr-4 shrink-0"),
                 rx.text(title, class_name="m-0 text-sm font-[475]"),
                 class_name=rx.cond(
                     active,
@@ -203,7 +202,6 @@ def _section_items(
         docs_sidebar_group(
             title,
             *(_leaf(leaf_title, leaf_route, url) for leaf_title, leaf_route in section_leaves),
-            icon=icon,
             open_=(
                 (url == "/")
                 | (url.startswith("/overview/") & (url != CHART_GALLERY_SIDEBAR_LINK[1]))
