@@ -8,6 +8,7 @@ from xy_docs.config import DOCS_CONFIG
 from xy_docs.constants import PUBLIC_DOCS_URL
 
 APP_ROOT = Path(__file__).resolve().parents[1]
+SITEMAP_NAMESPACE = {"sitemap": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 
 
 def expected_locations() -> list[str]:
@@ -30,7 +31,10 @@ def sitemap_locations(path: Path) -> list[str]:
         Sitemap location values in document order.
     """
     root = ElementTree.parse(path).getroot()
-    return [location.text or "" for location in root.findall("{*}url/{*}loc")]
+    return [
+        location.text or ""
+        for location in root.findall("sitemap:url/sitemap:loc", SITEMAP_NAMESPACE)
+    ]
 
 
 def main() -> None:

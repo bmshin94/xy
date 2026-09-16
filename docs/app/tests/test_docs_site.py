@@ -178,7 +178,9 @@ def _sitemap_routes(sitemap_path: Path) -> set[str]:
     root = ET.parse(sitemap_path).getroot()
     return {
         route
-        for location in root.findall("{*}url/{*}loc")
+        for location in root.findall(
+            "{http://www.sitemaps.org/schemas/sitemap/0.9}url/{http://www.sitemaps.org/schemas/sitemap/0.9}loc"
+        )
         if location.text is not None
         if (route := _normalize_xy_docs_path(location.text.strip())) is not None
     }
@@ -3014,3 +3016,28 @@ def test_xy_code_blocks_use_shared_docs_syntax_theme() -> None:
     rendered = str(code_block("print('hello')", "python"))
     assert "github-light-high-contrast" in rendered
     assert "github-dark-high-contrast" in rendered
+
+
+@pytest.mark.parametrize(
+    ("namespace", "accepted"),
+    [
+        ("http://www.sitemaps.org/schemas/sitemap/0.9", True),
+        ("https://www.sitemaps.org/schemas/sitemap/0.9", False),
+        ("https://example.com/invalid", False),
+        ("", False),
+    ],
+)
+def test_sitemap_validator_requires_standard_namespace(
+    tmp_path: Path, namespace: str, accepted: bool
+) -> None:
+    """Only sitemap elements in the standard HTTP namespace supply locations."""
+    import runpy
+
+    sitemap_locations = runpy.run_path(str(DOCS_APP_ROOT / "scripts/check_sitemap.py"))[
+        "sitemap_locations"
+    ]
+
+    path = tmp_path / "sitemap.xml"
+    location = "https://reflex.dev/docs/xy/"
+    path.write_text(f'<urlset xmlns="{namespace}"><url><loc>{location}</loc></url></urlset>')
+    assert sitemap_locations(path) == ([location] if accepted else [])
