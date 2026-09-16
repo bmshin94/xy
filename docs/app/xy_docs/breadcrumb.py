@@ -71,7 +71,7 @@ def xy_docs_breadcrumb(page: DocsPage, sidebar: rx.Component) -> rx.Component:
 
     for index, (label, href) in enumerate(parts):
         base_class = ui.cn(
-            "min-h-8 flex items-center text-sm font-[525] text-secondary-12 last:text-secondary-11",
+            "min-h-8 flex items-center text-sm font-[525] text-foreground last:text-muted-foreground",
             "truncate" if index == len(parts) - 1 else "",
         )
         breadcrumbs.append(
@@ -79,7 +79,7 @@ def xy_docs_breadcrumb(page: DocsPage, sidebar: rx.Component) -> rx.Component:
                 label,
                 class_name=ui.cn(
                     base_class,
-                    "hover:text-primary-10 dark:hover:text-primary-9",
+                    "hover:text-primary-hover dark:hover:text-primary",
                 ),
                 underline="none",
                 href=href,
@@ -90,11 +90,11 @@ def xy_docs_breadcrumb(page: DocsPage, sidebar: rx.Component) -> rx.Component:
                 (
                     ui.icon(
                         "ArrowRight01Icon",
-                        class_name="hidden size-4 text-secondary-11 lg:flex",
+                        class_name="hidden size-4 text-muted-foreground lg:flex",
                     ),
                     rx.text(
                         "/",
-                        class_name="flex font-sm text-secondary-11 lg:hidden",
+                        class_name="flex font-sm text-muted-foreground lg:hidden",
                     ),
                 )
             )
@@ -103,7 +103,7 @@ def xy_docs_breadcrumb(page: DocsPage, sidebar: rx.Component) -> rx.Component:
         breadcrumbs.append(
             rx.el.span(
                 page.title,
-                class_name="flex min-h-8 items-center text-sm font-[525] text-secondary-11",
+                class_name="flex min-h-8 items-center text-sm font-[525] text-muted-foreground",
             )
         )
 
@@ -127,11 +127,11 @@ def xy_docs_breadcrumb(page: DocsPage, sidebar: rx.Component) -> rx.Component:
             ui.icon(
                 "ArrowDown01Icon",
                 size=14,
-                class_name="flex !text-secondary-9 lg:hidden",
+                class_name="flex !text-subtle-foreground lg:hidden",
             ),
             class_name="flex flex-row items-center gap-2 p-[0.563rem] lg:p-0",
         ),
-        class_name="relative z-10 mb-10 flex w-full flex-row items-center justify-between gap-4 border-b border-secondary-4 max-lg:py-2 lg:gap-0 lg:border-none lg:p-0",
+        class_name="relative z-10 mb-10 flex w-full flex-row items-center justify-between gap-4 border-b border-border-subtle max-lg:py-2 lg:gap-0 lg:border-none lg:p-0",
     )
 
 

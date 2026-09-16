@@ -6,10 +6,10 @@ requires-python = ">=3.11"
 dependencies = [
     "numpy",
     "pillow",
-    "reflex @ git+https://github.com/reflex-dev/reflex@main",
-    "reflex-components-internal @ git+https://github.com/reflex-dev/reflex@main#subdirectory=packages/reflex-components-internal",
-    "reflex-docgen @ git+https://github.com/reflex-dev/reflex@main#subdirectory=packages/reflex-docgen",
-    "reflex-site-shared @ git+https://github.com/reflex-dev/reflex@main#subdirectory=packages/reflex-site-shared",
+    "reflex @ git+https://github.com/reflex-dev/reflex@codex/docs-editorial-refresh",
+    "reflex-components-internal @ git+https://github.com/reflex-dev/reflex@codex/docs-editorial-refresh#subdirectory=packages/reflex-components-internal",
+    "reflex-docgen @ git+https://github.com/reflex-dev/reflex@codex/docs-editorial-refresh#subdirectory=packages/reflex-docgen",
+    "reflex-site-shared @ git+https://github.com/reflex-dev/reflex@codex/docs-editorial-refresh#subdirectory=packages/reflex-site-shared",
     "xy[reflex]",
 ]
 

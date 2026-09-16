@@ -146,26 +146,26 @@ def _top_level_link(
                 rx.el.div(
                     class_name=(
                         "absolute left-0 top-1/2 -z-10 h-8 w-full "
-                        "-translate-y-1/2 rounded-lg bg-secondary-3"
+                        "-translate-y-1/2 rounded-lg bg-accent"
                     ),
                 ),
                 rx.fragment(),
             ),
             rx.box(
                 rx.icon(tag=icon, size=16, class_name="mr-4 shrink-0"),
-                rx.text(title, class_name="m-0 text-sm font-[525]"),
+                rx.text(title, class_name="m-0 text-sm font-[475]"),
                 class_name=rx.cond(
                     active,
                     (
                         "ml-[2.5rem] flex h-8 w-[calc(100%-2.5rem)] "
-                        "items-center justify-start text-primary-10 "
+                        "items-center justify-start text-primary-hover "
                         "xl:max-w-[14rem]"
                     ),
                     (
                         "ml-[2.5rem] flex h-8 w-[calc(100%-2.5rem)] "
-                        "items-center justify-start text-secondary-11 "
-                        "transition-colors group-hover:text-primary-10 "
-                        "dark:group-hover:text-primary-9 xl:max-w-[14rem]"
+                        "items-center justify-start text-muted-foreground "
+                        "transition-colors group-hover:text-primary-hover "
+                        "dark:group-hover:text-primary xl:max-w-[14rem]"
                     ),
                 ),
             ),

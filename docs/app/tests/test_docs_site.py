@@ -94,7 +94,6 @@ import reflex_xy
 import xy
 from xy.components import _MARK_APPLIERS, _POLAR_INERT_AXIS_KEYWORDS
 
-SITEMAP_NAMESPACE = {"sitemap": "https://www.sitemaps.org/schemas/sitemap/0.9"}
 DOCS_APP_ROOT = Path(__file__).resolve().parent.parent
 DOCS_ROOT = DOCS_APP_ROOT.parent
 EXPORTED_SITEMAP = DOCS_APP_ROOT / ".web" / "public" / "sitemap.xml"
@@ -179,7 +178,7 @@ def _sitemap_routes(sitemap_path: Path) -> set[str]:
     root = ET.parse(sitemap_path).getroot()
     return {
         route
-        for location in root.findall("sitemap:url/sitemap:loc", SITEMAP_NAMESPACE)
+        for location in root.findall("{*}url/{*}loc")
         if location.text is not None
         if (route := _normalize_xy_docs_path(location.text.strip())) is not None
     }
@@ -838,8 +837,8 @@ def test_sdf_plot_grid_is_cached_and_uses_reflex_toolbar_tokens() -> None:
 
     rendered = str(xy_sdf_plot_grid(config))
     expected_tokens = {
-        "--chart-text": "var(--secondary-11)",
-        "--chart-focus": "var(--primary-9)",
+        "--chart-text": "var(--muted-foreground)",
+        "--chart-focus": "var(--ring)",
     }
 
     for name, value in expected_tokens.items():
@@ -1610,14 +1609,14 @@ def test_chart_gallery_grid_renders_every_type_as_inline_svg(
     assert rendered.count("max-width: 88rem") == 1
     assert rendered.count("2xl:grid-cols-3") == 9
     assert rendered.count("aspect-[320/232]") == 35
-    assert rendered.count("shadow-large") == 35
+    assert rendered.count("shadow-small") == 35
     assert rendered.count("transition-bg") == 35
-    assert "--gallery-preview-surface: #fff" in rendered
-    assert "--gallery-preview-fill: #efeaff" in rendered
-    assert "--gallery-preview-soft: #dccfff" in rendered
-    assert "--gallery-preview-bar: #dccfff" in rendered
-    assert "--gallery-preview-stroke: #a790f0" in rendered
-    assert "--gallery-preview-strong: #8067d7" in rendered
+    assert "--gallery-preview-surface: var(--muted)" in rendered
+    assert "--gallery-preview-fill: var(--accent)" in rendered
+    assert "--gallery-preview-soft: var(--border)" in rendered
+    assert "--gallery-preview-bar: var(--subtle-foreground)" in rendered
+    assert "--gallery-preview-stroke: var(--muted-foreground)" in rendered
+    assert "--gallery-preview-strong: var(--foreground)" in rendered
     assert "--gallery-preview-muted" not in rendered
     assert "object-contain" not in rendered
     assert "object-center" not in rendered
@@ -2238,7 +2237,7 @@ def test_xy_sidebar_reuses_memoized_official_navigation_rows() -> None:
 
     assert "/core-concepts/axes-and-scales/" in instance
     assert re.findall(
-        r'jsx\(RadixThemesText,\{as:"p",className:"m-0 text-sm font-\[525\]"\},"([^"]+)"\)',
+        r'jsx\(RadixThemesText,\{as:"p",className:"m-0 text-sm font-\[(?:475|525)\]"\},"([^"]+)"\)',
         rendered,
     ) == [
         row_title
@@ -2270,15 +2269,15 @@ def test_xy_sidebar_reuses_memoized_official_navigation_rows() -> None:
     assert rendered.count("guideMarginClass") == expected_leaf_count
     assert (
         rendered.count(
-            "absolute left-0 top-1/2 -z-10 h-8 w-full -translate-y-1/2 rounded-lg bg-secondary-3"
+            "absolute left-0 top-1/2 -z-10 h-8 w-full -translate-y-1/2 rounded-lg bg-accent"
         )
         == direct_link_count
     )
     assert (
         rendered.count(
             "ml-[2.5rem] flex h-8 w-[calc(100%-2.5rem)] items-center "
-            "justify-start text-secondary-11 transition-colors "
-            "group-hover:text-primary-10 dark:group-hover:text-primary-9 "
+            "justify-start text-muted-foreground transition-colors "
+            "group-hover:text-primary-hover dark:group-hover:text-primary "
             "xl:max-w-[14rem]"
         )
         == direct_link_count
@@ -2419,11 +2418,11 @@ def test_xy_navbar_uses_xy_links_github_and_the_official_drawer() -> None:
 
     rendered = str(xy_docs_navbar._definition.component)
 
-    assert 'href:"/"' in rendered
+    assert 'to:"/"' in rendered
     assert '"aria-label":"Reflex XY"' in rendered
     assert "M29 16H32V10H39V7H32V4H39V1H29V16" in rendered
-    assert 'href:"/docs/xy/"' in rendered
-    assert 'href:"/docs/xy/integrations/reflex/"' in rendered
+    assert 'to:"/"' in rendered
+    assert 'to:"/integrations/reflex/"' in rendered
     assert "Overview" in rendered
     assert "Reflex Integration" in rendered
     assert 'variant:"ghost"},"Build with AI"' not in rendered
@@ -2434,18 +2433,21 @@ def test_xy_navbar_uses_xy_links_github_and_the_official_drawer() -> None:
     assert "Discord Community" not in rendered
     assert 'variant:"primary"' in rendered
     assert "View XY on GitHub -" not in rendered
-    assert rendered.count("View XY on GitHub") == 2
+    assert rendered.count("View XY on GitHub") == 4
     assert 'target:"_blank"' in rendered
     assert 'rel:"noopener noreferrer"' in rendered
-    assert "Open sidebar" in rendered
+    from xy_docs.navbar import _mobile_navigation
+
+    assert str(_mobile_navigation()) in rendered
     assert "Menu01Icon" in rendered
     assert "Cancel01Icon" in rendered
     assert "Mobile documentation navigation" not in rendered
     assert "<details" not in rendered
     assert "<summary" not in rendered
     assert XY_REPOSITORY_URL in rendered
-    assert "XY's initial launch is here" in rendered
-    assert "Get started" in rendered
+    from reflex_site_shared.views.hosting_banner import hosting_banner
+
+    assert str(hosting_banner()) in rendered
     assert "Reserve your spot" not in rendered
     assert "https://luma.com/a1ty77bt" not in rendered
     assert "Reflex Agent Toolkit is launching" not in rendered
@@ -2982,3 +2984,33 @@ def test_documented_factories_describe_every_parameter() -> None:
             "Chart",
             parameter.name,
         )
+
+
+def test_xy_navbar_uses_early_mobile_breakpoint_and_current_section() -> None:
+    """Keep section selection accessible and desktop links hidden below 1280px."""
+    from xy_docs.navbar import _menu_item, _navigation_menu
+
+    menu = _navigation_menu()
+    assert "hidden xl:flex" in str(menu.children[0].class_name)
+    assert "xl:hidden" in str(menu.children[1].children[-1].class_name)
+    link = _menu_item("Overview", "/docs/xy/").children[0]
+    assert '"aria-current"' in str(link)
+
+
+def test_xy_navbar_internal_links_preserve_client_navigation() -> None:
+    """Internal section changes keep the document and announcement mounted."""
+    from xy_docs.navbar import _menu_item
+
+    item = _menu_item("Reflex Integration", "/docs/xy/integrations/reflex/")
+    assert type(item.children[0]).__name__ == "ReactRouterLink"
+    assert str(item.children[0].to).strip('"') == "/integrations/reflex/"
+    assert "inset_0_-1px" in str(item.class_name)
+
+
+def test_xy_code_blocks_use_shared_docs_syntax_theme() -> None:
+    """Normal and demo code use the same syntax palette as Reflex docs."""
+    from xy_docs.code import code_block
+
+    rendered = str(code_block("print('hello')", "python"))
+    assert "github-light-high-contrast" in rendered
+    assert "github-dark-high-contrast" in rendered
