@@ -89,12 +89,6 @@ SIDEBAR_SECTION_GROUPS = (
     ("Other", "/integrations/", (*DOCS_SECTIONS[5:7], *DOCS_SECTIONS[8:])),
 )
 
-INTEGRATION_LINK_ICONS = {
-    "/integrations/reflex/": "atom",
-    "/integrations/notebooks/": "notebook-tabs",
-    "/integrations/matplotlib/": "chart-no-axes-combined",
-}
-
 
 def _leaf(
     title: str,
@@ -134,7 +128,6 @@ def _section_leaves(
 def _top_level_link(
     title: str,
     href: str,
-    icon: str,
     url: rx.vars.StringVar[str],
 ) -> rx.Component:
     """Render a direct link aligned with icon-free sidebar group headings."""
@@ -179,20 +172,18 @@ def _top_level_link(
 def _section_items(
     title: str,
     landing_route: str,
-    icon: str,
     leaves: tuple[tuple[str, str], ...],
     url: rx.vars.StringVar[str],
 ) -> tuple[rx.Component, ...]:
     """Render one sidebar section as a group or a set of direct links."""
     if not leaves:
-        return (_top_level_link(title, landing_route, icon, url),)
+        return (_top_level_link(title, landing_route, url),)
     section_leaves = _section_leaves(landing_route, leaves)
     if title == "Integrations":
         return tuple(
             _top_level_link(
                 title if leaf_route == landing_route else leaf_title,
                 leaf_route,
-                INTEGRATION_LINK_ICONS[leaf_route],
                 url,
             )
             for leaf_title, leaf_route in section_leaves
@@ -276,8 +267,8 @@ def xy_docs_sidebar_comp(url: rx.vars.StringVar[str]) -> rx.Component:
                 group_route,
                 *(
                     item
-                    for title, landing_route, icon, leaves in sections
-                    for item in _section_items(title, landing_route, icon, leaves, url)
+                    for title, landing_route, _icon, leaves in sections
+                    for item in _section_items(title, landing_route, leaves, url)
                 ),
                 connected_line=False,
             )
@@ -312,7 +303,6 @@ def xy_docs_sidebar(route: str) -> rx.Component:
 __all__ = [
     "CHART_FAMILY_SIDEBAR_SECTIONS",
     "CHART_GALLERY_SIDEBAR_LINK",
-    "INTEGRATION_LINK_ICONS",
     "PIE_DOCS_ROUTE",
     "POLAR_DOCS_ROUTE",
     "POLAR_DOCS_ROUTES",

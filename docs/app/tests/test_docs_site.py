@@ -75,7 +75,6 @@ from xy_docs.navbar import XY_REPOSITORY_URL, xy_docs_navbar
 from xy_docs.sidebar import (
     CHART_FAMILY_SIDEBAR_SECTIONS,
     CHART_GALLERY_SIDEBAR_LINK,
-    INTEGRATION_LINK_ICONS,
     PIE_DOCS_ROUTE,
     POLAR_DOCS_ROUTE,
     POLAR_DOCS_ROUTES,
@@ -2264,7 +2263,11 @@ def test_xy_sidebar_reuses_memoized_official_navigation_rows() -> None:
         title != "Integrations" and bool(leaves)
         for title, _landing_route, _icon, leaves in grouped_sections
     )
-    direct_link_count = len(INTEGRATION_LINK_ICONS) + 1
+    direct_link_count = sum(
+        len(leaves) if title == "Integrations" else int(not leaves)
+        for title, _landing_route, _icon, leaves in grouped_sections
+    )
+
     assert rendered.count('jsx("details"') == accordion_count
     assert rendered.count('jsx("summary"') == accordion_count
     assert rendered.count("group/details") == accordion_count
@@ -2375,7 +2378,7 @@ def test_xy_sidebar_reuses_memoized_official_navigation_rows() -> None:
         "LucideNotebookTabs",
         "LucideChartNoAxesCombined",
     ):
-        assert icon in rendered
+        assert icon not in rendered
     assert "LucidePlug" not in rendered
     assert rendered.count('"aria-current":((') == direct_link_count
     assert ">XY<" not in rendered
@@ -2401,12 +2404,13 @@ def test_xy_sidebar_opens_only_the_current_chart_family(
     chart_families = (*CHART_FAMILY_SIDEBAR_SECTIONS, POLAR_SIDEBAR_SECTION)
     open_groups = [
         title
-        for title, landing_route, icon, leaves in chart_families
-        if "open:true" in str(_section_items(title, landing_route, icon, leaves, route)[0])
+        for title, landing_route, _icon, leaves in chart_families
+        if "open:true" in str(_section_items(title, landing_route, leaves, route)[0])
     ]
 
     assert open_groups == ([] if expected_open_group is None else [expected_open_group])
-    gallery_link = str(_section_items(*CHART_GALLERY_SIDEBAR_LINK, route)[0])
+    title, landing_route, _icon, leaves = CHART_GALLERY_SIDEBAR_LINK
+    gallery_link = str(_section_items(title, landing_route, leaves, route)[0])
     assert 'jsx("details"' not in gallery_link
     assert ('"aria-current":(true ? "page"' in gallery_link) == (
         route == CHART_GALLERY_SIDEBAR_LINK[1]
