@@ -513,12 +513,18 @@ production approval is the operator's opportunity to inspect the staged site
 before promoting it.
 
 The site workflow shares concurrency group `deploy-xy-docs-stg` with the
-library-triggered `deploy-docs-stg.yml`, with `cancel-in-progress: false`. A run
-waiting for production approval holds that group, so newer library-triggered
-and docs-only deployments cannot advance past it. If that run is obsolete,
-explicitly cancel it in Actions before expecting a newer deployment to proceed;
-dispatching another run does not cancel the existing approval wait. The separate
-dev deployment continues to follow pushes to `main`.
+library-triggered `deploy-docs-stg.yml`. Both set `cancel-in-progress: false` and
+`queue: max`: one deployment runs at a time and up to 100 pending deployments
+are retained. Without `queue: max`, a new dispatch replaces the single pending
+run even when cancellation of the active run is disabled. Once the 100-run
+pending queue is full, GitHub cancels additional runs; it is not an unbounded
+queue. See [GitHub's concurrency documentation](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency#example-queueing-multiple-pending-runs).
+
+A run waiting for production approval holds that group, so newer
+library-triggered and docs-only deployments cannot advance past it. If that run
+is obsolete, explicitly cancel it in Actions before expecting a newer deployment
+to proceed; dispatching another run does not cancel the existing approval wait.
+The separate dev deployment continues to follow pushes to `main`.
 
 ### Landing changes
 

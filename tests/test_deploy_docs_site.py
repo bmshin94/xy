@@ -176,7 +176,11 @@ def test_site_deployment_is_manual_and_serialized_with_release_deployment(workfl
     assert source_ref["default"] == "main"
     release = yaml.safe_load((WORKFLOW_PATH.parent / "deploy-docs-stg.yml").read_text())
     assert workflow["concurrency"]["group"] == release["concurrency"]["group"]
-    assert workflow["concurrency"]["cancel-in-progress"] is False
+    # Every caller must retain pending deployments: cancel-in-progress alone
+    # protects the active run but lets a third dispatch replace the second.
+    for document in (workflow, release):
+        assert document["concurrency"]["cancel-in-progress"] is False
+        assert document["concurrency"].get("queue") == "max"
 
 
 def test_input_is_passed_as_data_and_only_the_resolved_source_is_built(workflow):

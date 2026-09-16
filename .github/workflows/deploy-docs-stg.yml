@@ -41,6 +41,7 @@ permissions:
 concurrency:
   group: deploy-xy-docs-stg
   cancel-in-progress: false
+  queue: max
 
 jobs:
   prepare:
