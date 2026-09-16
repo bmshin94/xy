@@ -72,7 +72,12 @@ def _menu_item(label: str, href: str) -> rx.Component:
     full = href.rstrip("/")
     active = (path == full) | (path == relative)
     if relative == "/":
-        active = active | (path == "/index")
+        active = (
+            active
+            | (path == "/index")
+            | path.startswith("/overview/")
+            | path.startswith("/docs/xy/overview/")
+        )
     else:
         active = active | path.startswith(full + "/") | path.startswith(relative + "/")
     return ui.navigation_menu.item(
@@ -87,10 +92,7 @@ def _menu_item(label: str, href: str) -> rx.Component:
                 "focus-visible:outline-offset-2 focus-visible:outline-ring"
             ),
         ),
-        class_name=ui.cn(
-            "flex h-full items-center justify-center",
-            rx.cond(active, "shadow-[inset_0_-1px_0_0_var(--primary-hover)]", ""),
-        ),
+        class_name="flex h-full items-center justify-center",
         custom_attrs={"role": "menuitem"},
     )
 

@@ -65,15 +65,16 @@ validators below. The Git lock remains portable; deployment of the neutral
 semantic styling requires updating that lock after the shared changes land.
 The desktop XY docs navigation switches to a docs-specific disclosure below
 1280px, preserving Overview and Reflex Integration destinations. Desktop links
-expose the selected section through `aria-current="page"` and an inset underline.
+expose the selected section through `aria-current="page"` without an active underline.
 Internal navbar destinations use client-side routing so page changes preserve
 announcement dismissal without a full document reload. Code blocks share
 Reflex docs' light/dark syntax themes and neutral surface tokens while retaining
 XY's accessible clipboard feedback. XY footer links and headings use the shared
 book-weight typography, actions use small shadows, and custom sidebar links use
 weight 475. Gallery previews, playground controls, API references, Markdown,
-and demo surfaces use semantic theme tokens in both color modes; data-series
-colors remain chart-specific.
+and demo UI text and borders use semantic theme tokens in both color modes.
+Chart canvases retain explicit white/black backgrounds to match their rendered
+plots; data-series colors remain chart-specific.
 
 Live chart demos reuse the Reflex Build action from `reflex-site-shared`, and
 the documentation navbar uses that package's keyword-only Algolia search. The

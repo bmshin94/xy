@@ -2152,7 +2152,7 @@ def test_inline_svg_gallery_validator_requires_every_styled_preview(tmp_path: Pa
     """Accept only the complete code-native gallery in the production route."""
     module_path = tmp_path / "route.jsx"
     preview = 'viewBox=\\"0 0 320 232\\"'
-    surface = "gallery-preview-surface aspect-[320/232] shadow-large"
+    surface = "gallery-preview-surface aspect-[320/232] shadow-small"
     expected = check_html_routes.INLINE_SVG_PREVIEW_COUNT
     module_path.write_text(preview * expected + surface, encoding="utf-8")
 
@@ -2239,7 +2239,7 @@ def test_xy_sidebar_reuses_memoized_official_navigation_rows() -> None:
 
     assert "/core-concepts/axes-and-scales/" in instance
     assert re.findall(
-        r'jsx\(RadixThemesText,\{as:"p",className:"m-0 text-sm font-\[(?:475|525)\]"\},"([^"]+)"\)',
+        r'jsx\(RadixThemesText,\{as:"p",className:"m-0 text-sm font-\[475\]"\},"([^"]+)"\)',
         rendered,
     ) == [
         row_title
@@ -3006,7 +3006,7 @@ def test_xy_navbar_internal_links_preserve_client_navigation() -> None:
     item = _menu_item("Reflex Integration", "/docs/xy/integrations/reflex/")
     assert type(item.children[0]).__name__ == "ReactRouterLink"
     assert str(item.children[0].to).strip('"') == "/integrations/reflex/"
-    assert "inset_0_-1px" in str(item.class_name)
+    assert "inset_0_-1px" not in str(item.class_name)
 
 
 def test_xy_code_blocks_use_shared_docs_syntax_theme() -> None:
@@ -3041,3 +3041,23 @@ def test_sitemap_validator_requires_standard_namespace(
     location = "https://reflex.dev/docs/xy/"
     path.write_text(f'<urlset xmlns="{namespace}"><url><loc>{location}</loc></url></urlset>')
     assert sitemap_locations(path) == ([location] if accepted else [])
+
+
+@pytest.mark.parametrize(
+    "path", ["/", "/index", "/overview/installation/", "/docs/xy/overview/installation/"]
+)
+def test_overview_navbar_marks_child_routes_current(
+    monkeypatch: pytest.MonkeyPatch, path: str
+) -> None:
+    """Overview descendants retain the active section indicator."""
+    from types import SimpleNamespace
+
+    import reflex as rx
+    from xy_docs.navbar import _menu_item
+
+    monkeypatch.setattr(
+        rx, "State", SimpleNamespace(router=SimpleNamespace(page=SimpleNamespace(path=path)))
+    )
+    item = _menu_item("Overview", "/docs/xy/")
+    assert '"aria-current":(true ? "page" : null)' in str(item.children[0])
+    assert "inset_0_-1px" not in str(item.class_name)
