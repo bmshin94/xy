@@ -56,6 +56,7 @@ providing stable accessible names and polite copied/failed announcements. Its
 production-DOM check rejects both unnamed controls and shared-theme generated
 text that would replace the copy/check icon feedback.
 
+The docs app disables the built-with-Reflex badge in its configuration.
 The docs recolor consumes the reusable `reflex-site-shared` theme and components
 directly. XY keeps only its branding, navigation, and project-specific footer
 content; it must not vendor shared CSS, search/buttons, or the navbar frame and
