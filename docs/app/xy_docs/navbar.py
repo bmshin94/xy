@@ -141,7 +141,7 @@ def _mobile_navigation() -> rx.Component:
                 )
                 for label, href in _XY_NAV_LINKS
             ],
-            _github_button(),
+            rx.el.div(_github_button(), class_name="mt-4"),
             aria_label="XY documentation navigation",
             role="navigation",
             class_name="fixed inset-x-0 top-[var(--docs-header-height)] max-h-[calc(100dvh-var(--docs-header-height))] overflow-y-auto border-b border-border-subtle bg-background px-6 py-4 shadow-small",
