@@ -2428,6 +2428,7 @@ def test_xy_navbar_uses_xy_links_github_and_the_official_drawer() -> None:
     assert '"aria-label":"Reflex XY"' in rendered
     assert "M29 16H32V10H39V7H32V4H39V1H29V16" in rendered
     assert 'to:"/"' in rendered
+    assert 'href:"/docs/"' in rendered
     assert 'to:"/integrations/reflex/"' in rendered
     assert "Overview" in rendered
     assert "Reflex Integration" in rendered

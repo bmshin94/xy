@@ -198,9 +198,9 @@ def xy_docs_navbar() -> rx.Component:
         Official documentation navbar with an active XY section.
     """
     return docs_navbar_frame(
-        rx.el.a(
+        rx.el.elements.a(
             xy_docs_logo(),
-            href="/",
+            href="/docs/",
             class_name="mr-10 flex shrink-0 items-center gap-2.5 no-underline",
         ),
         _navigation_menu(),
